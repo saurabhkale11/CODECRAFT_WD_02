@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .stopwatch {
+            margin-top: 50px;
+        }
+
+        .time {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .buttons button:hover {
+            background-color: #ddd;
+        }
+
+        .laps {
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: left;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+        }
+
+        .laps ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .laps ul li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .laps ul li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time" id="display">00:00:00.00</div>
+        <div class="buttons">
+            <button id="start">Start</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Reset</button>
+            <button id="lap">Lap</button>
+        </div>
+        <div class="laps" id="laps">
+            <ul></ul>
+        </div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let interval;
+        let running = false;
+
+        const display = document.getElementById('display');
+        const laps = document.getElementById('laps').querySelector('ul');
+
+        function formatTime(time) {
+            const milliseconds = Math.floor((time % 1000) / 10);
+            const seconds = Math.floor((time / 1000) % 60);
+            const minutes = Math.floor((time / (1000 * 60)) % 60);
+            const hours = Math.floor((time / (1000 * 60 * 60)) % 24);
+
+            return (
+                String(hours).padStart(2, '0') + ":" +
+                String(minutes).padStart(2, '0') + ":" +
+                String(seconds).padStart(2, '0') + "." +
+                String(milliseconds).padStart(2, '0')
+            );
+        }
+
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            display.textContent = formatTime(elapsedTime);
+        }
+
+        document.getElementById('start').addEventListener('click', () => {
+            if (!running) {
+                running = true;
+                startTime = Date.now() - elapsedTime;
+                interval = setInterval(updateTime, 10);
+            }
+        });
+
+        document.getElementById('pause').addEventListener('click', () => {
+            if (running) {
+                running = false;
+                clearInterval(interval);
+            }
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            running = false;
+            clearInterval(interval);
+            startTime = 0;
+            elapsedTime = 0;
+            display.textContent = "00:00:00.00";
+            laps.innerHTML = "";
+        });
+
+        document.getElementById('lap').addEventListener('click', () => {
+            if (running) {
+                const lapTime = document.createElement('li');
+                lapTime.textContent = formatTime(elapsedTime);
+                laps.appendChild(lapTime);
+            }
+        });
+    </script>
+</body>
+</html>
